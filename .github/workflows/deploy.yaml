@@ -1,0 +1,56 @@
+name: user-service deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check
+        run: |
+          docker -v
+          docker compose version
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        
+      # - name: Configure AWS credentials
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v2
+      
+      # - name: Build, tag, and push docker image to Amazon ECR
+      #   env:
+      #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #     REPOSITORY: user-service
+      #     IMAGE_TAG: ${{ github.sha }}
+      #   run: |
+      #     docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+      #     docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/msa-user-service:$GITHUB_SHA .
+          docker build -t ghcr.io/${{ github.repository_owner }}/msa-user-service:latest .
+          docker push ghcr.io/${{ github.repository_owner }}/msa-user-service:$GITHUB_SHA
+          docker push ghcr.io/${{ github.repository_owner }}/msa-user-service:latest
+
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v4
+        with:
+          token: ${{ secrets.PAT }}
+          repository: yunjeongwon/msa-infra
+          event-type: deploy
+          client-payload: |
+            {
+              "service": "user-service"
+            }
