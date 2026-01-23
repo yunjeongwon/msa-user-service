@@ -49,3 +49,5 @@ jobs:
           gh api /repos/yunjeongwon/msa-infra/dispatches \
             -f event_type='deploy' \
             -f client_payload[service]='user-service'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
