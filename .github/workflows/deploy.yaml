@@ -45,7 +45,7 @@ jobs:
 
   Deploy:
     needs: Build
-    uses: yunjeongwon/msa-infra/.github/workflows/deploy.yaml@main
+    uses: yunjeongwon/msa-infra/.github/workflows/deploy.yaml@master
     with:
       service: user-service
     secrets: inherit
