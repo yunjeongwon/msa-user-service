@@ -1,12 +1,11 @@
 name: user-service deploy
 
-on: workflow_dispatch
-  # push:
-  #   branches:
-  #     - master
+on:
+  push:
+    branches: [master]
 
 jobs:
-  Deploy:
+  Build:
     runs-on: ubuntu-latest
     steps:
       - name: check
@@ -44,10 +43,9 @@ jobs:
           docker push ghcr.io/${{ github.repository_owner }}/msa-user-service:$GITHUB_SHA
           docker push ghcr.io/${{ github.repository_owner }}/msa-user-service:latest
 
-      - name: dispatch repo
-        run: |
-          gh api /repos/yunjeongwon/msa-infra/dispatches \
-            -f event_type='deploy' \
-            -f client_payload[service]='user-service'
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+  Deploy:
+    needs: Build
+    uses: yunjeongwon/msa-infra/.github/workflows/deploy.yaml@main
+    with:
+      service: user-service
+    secrets: inherit
