@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
         
       # - name: Configure AWS credentials
       #   id: login-ecr
@@ -31,12 +34,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.PAT }}
 
-      - name: Build and Push Docker image
-        run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/msa-user-service:$GITHUB_SHA .
-          docker build -t ghcr.io/${{ github.repository_owner }}/msa-user-service:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/msa-user-service:$GITHUB_SHA
-          docker push ghcr.io/${{ github.repository_owner }}/msa-user-service:latest
+      # - name: Build and Push Docker image
+      #   run: |
+      #     docker build -t ghcr.io/${{ github.repository_owner }}/msa-user-service:$GITHUB_SHA .
+      #     docker build -t ghcr.io/${{ github.repository_owner }}/msa-user-service:latest .
+      #     docker push ghcr.io/${{ github.repository_owner }}/msa-user-service:$GITHUB_SHA
+      #     docker push ghcr.io/${{ github.repository_owner }}/msa-user-service:latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/msa-user-service:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/msa-user-service:latest
 
       - name: send trigger
         run: |
