@@ -17,6 +17,9 @@ jobs:
       - name: Configure AWS credentials
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+        with:
+          role-to-assume: arn:aws:iam::267837905230:role/github-actions-ecr
+          aws-region: ap-northeast-2
 
       - name: Build and push
         uses: docker/build-push-action@v6
