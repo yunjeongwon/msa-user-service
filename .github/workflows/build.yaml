@@ -29,7 +29,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/board-system/user-service:${{ github.sha }}
             ${{ steps.login-ecr.outputs.registry }}/board-system/user-service:latest
@@ -43,4 +43,4 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/yunjeongwon/msa-infra/dispatches \
             -d '{"event_type":"deploy","client_payload":{"service":"user-service"}}'
-          
+        
