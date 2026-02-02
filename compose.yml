@@ -1,0 +1,13 @@
+services:
+  user-service:
+    image: 267837905230.dkr.ecr.ap-northeast-2.amazonaws.com/board-system/user-service:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_HOST}:3306/user_db
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: http://host.docker.internal:9092
+      JWT_SECRET: ${JWT_SECRET}
+      POINT_SERVICE_URL: http://host.docker.internal:8082
