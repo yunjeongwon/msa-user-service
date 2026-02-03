@@ -64,6 +64,7 @@ jobs:
           script_stop: true
           script: |
             cd /home/ubuntu/msa-user-service
+            git pull origin master
             docker compose pull
             docker compose up -d
   
