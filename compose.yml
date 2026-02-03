@@ -8,6 +8,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://${DB_HOST}:3306/user_db
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: host.docker.internal:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-server:9092
       JWT_SECRET: ${JWT_SECRET}
-      POINT_SERVICE_URL: http://host.docker.internal:8082
+      POINT_SERVICE_URL: http://point-service:8080
+
+networks:
+  default:
+    external: true
+    name: msa-net
