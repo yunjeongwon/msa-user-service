@@ -38,15 +38,29 @@ jobs:
       - name: ec2 SSH
         uses: appleboy/ssh-action@v1.0.3
         env:
+          SERVER_PORT: 8080
           DB_HOST: ${{ secrets.DB_HOST }}
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          DB_NAME: user_db
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          KAFKA_HOST: ${{ secrets.KAFKA_SERVER_HOST }}
+          KAFKA_PORT: 9092
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          POINT_SERVICE_HOST: ${{ secrets.POINT_SERVICE_HOST }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          envs: DB_HOST, MYSQL_ROOT_PASSWORD, JWT_SECRET, DB_USERNAME
+          envs: >
+            SERVER_PORT,
+            DB_HOST,
+            DB_NAME,
+            SPRING_DATASOURCE_USERNAME,
+            SPRING_DATASOURCE_PASSWORD,
+            KAFKA_HOST,
+            KAFKA_PORT,
+            JWT_SECRET,
+            POINT_SERVICE_HOST
           script_stop: true
           script: |
             cd /home/ubuntu/msa-user-service
