@@ -64,7 +64,11 @@ jobs:
           script_stop: true
           script: |
             cd /home/ubuntu/msa-user-service
-            git pull origin master
+
+            git fetch origin
+            git reset --hard origin/main
+            git clean -fd
+            
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 267837905230.dkr.ecr.ap-northeast-2.amazonaws.com
             docker compose pull
             docker compose up -d
