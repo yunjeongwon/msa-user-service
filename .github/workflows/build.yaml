@@ -66,7 +66,7 @@ jobs:
             cd /home/ubuntu/msa-user-service
 
             git fetch origin
-            git reset --hard origin/main
+            git reset --hard origin/master
             git clean -fd
             
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 267837905230.dkr.ecr.ap-northeast-2.amazonaws.com
