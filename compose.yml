@@ -1,6 +1,7 @@
 services:
   user-service:
     image: 267837905230.dkr.ecr.ap-northeast-2.amazonaws.com/board-system/user-service:latest
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
