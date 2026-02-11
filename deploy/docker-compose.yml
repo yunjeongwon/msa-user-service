@@ -1,6 +1,6 @@
 services:
   user-service:
-    image: 267837905230.dkr.ecr.ap-northeast-2.amazonaws.com/board-system/user-service:latest
+    image: 267837905230.dkr.ecr.ap-northeast-2.amazonaws.com/board-system/user-service:${IMAGE_TAG}
     restart: unless-stopped
     ports:
       - "8080"
