@@ -3,6 +3,7 @@ set -e
 set -o pipefail
 
 echo "===== deploy start ====="
+SERVICE_NAME=${SERVICE_NAME:-user-service}
 
 # 1. 서비스 디렉토리 이동
 mkdir -p /home/ubuntu/${SERVICE_NAME}
