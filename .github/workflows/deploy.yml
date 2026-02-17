@@ -40,69 +40,23 @@ jobs:
           aws s3 cp deploy/ \
           s3://bs-bucket-a/user-service/deploy/ \
           --recursive
-
-      - name: ssm command
-        env:
-          SERVICE_NAME: user-service
-          DEPLOY_DIR: /home/ubuntu/user-service
+      
+      - name: save image tag as sha
         run: |
-          COMMAND_ID=$(aws ssm send-command \
-            --query "Command.CommandId" \
-            --output text \
-            --region ap-northeast-2 \
-            --targets "Key=tag:Service,Values=user-service" \
-            --document-name "AWS-RunShellScript" \
-            --parameters "commands=[
-            \"mkdir -p ${DEPLOY_DIR}\",
-            \"export SERVICE_NAME=${SERVICE_NAME}\",
-            \"export IMAGE_TAG=${{ github.sha }}\",
-            \"aws s3 cp s3://bs-bucket-a/${SERVICE_NAME}/deploy/deploy.sh ${DEPLOY_DIR}/deploy.sh\",
-            \"chmod +x ${DEPLOY_DIR}/deploy.sh\",
-            \"bash ${DEPLOY_DIR}/deploy.sh\"
-            ]")
+          aws ssm put-parameter \
+            --name "/prod/board-system/user-service/SERVICE_NAME" \
+            --value "user-service" \
+            --type String \
+            --overwrite
 
-          INSTANCE_ID=$(aws ec2 describe-instances \
-            --region ap-northeast-2 \
-            --filters "Name=tag:Service,Values=user-service" \
-                      "Name=instance-state-name,Values=running" \
-            --query "Reservations[0].Instances[0].InstanceId" \
-            --output text)
-
-          aws ssm wait command-executed \
-            --command-id ${COMMAND_ID} \
-            --instance-id ${INSTANCE_ID}
-
-      # - name: ec2 SSH
-      #   uses: appleboy/ssh-action@v1.0.3
-      #   env:
-      #     SERVER_PORT: 8080
-      #     SPRING_DATASOURCE_URL: jdbc:mysql://${{ secrets.DB_HOST }}:3306/user_db
-      #     SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
-      #     SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-      #     KAFKA_BOOTSTRAP_SERVERS: ${{ secrets.KAFKA_SERVER_HOST }}:${{ secrets.KAFKA_SERVER_PORT }}
-      #     JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      #     POINT_SERVICE_URL: http://${{ secrets.POINT_SERVICE_HOST }}
-      #   with:
-      #     host: ${{ secrets.USER_SERVICE_HOST }}
-      #     username: ${{ secrets.EC2_USERNAME }}
-      #     key: ${{ secrets.EC2_PRIVATE_KEY }}
-      #     envs: >
-      #       SERVER_PORT,
-      #       SPRING_DATASOURCE_URL,
-      #       SPRING_DATASOURCE_USERNAME,
-      #       SPRING_DATASOURCE_PASSWORD,
-      #       KAFKA_BOOTSTRAP_SERVERS,
-      #       JWT_SECRET,
-      #       POINT_SERVICE_URL
-      #     script_stop: true
-      #     script: |
-      #       cd /home/ubuntu/msa-user-service
-
-      #       git fetch origin
-      #       git reset --hard origin/master
-      #       git clean -fd
-            
-      #       aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 267837905230.dkr.ecr.ap-northeast-2.amazonaws.com
-      #       docker compose pull
-      #       docker compose up -d
-  
+          aws ssm put-parameter \
+            --name "/prod/board-system/user-service/IMAGE_TAG" \
+            --value "${{ github.sha }}" \
+            --type String \
+            --overwrite
+      
+      - name: ASG instance refresh
+        run: |
+          aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name user-service-asg \
+            --preferences MinHealthyPercentage=100

@@ -3,7 +3,6 @@ set -e
 set -o pipefail
 
 echo "===== deploy start ====="
-echo "IMAGE_TAG=${IMAGE_TAG}"
 
 # 1. 서비스 디렉토리 이동
 mkdir -p /home/ubuntu/${SERVICE_NAME}
@@ -27,7 +26,7 @@ aws ssm get-parameters-by-path \
   --output text \
 | awk '{split($1,a,"/"); print a[length(a)]"="$2}' > .env
 
-# point-service 전용
+# user-service 전용
 aws ssm get-parameters-by-path \
   --region ap-northeast-2 \
   --path /prod/board-system/${SERVICE_NAME} \
